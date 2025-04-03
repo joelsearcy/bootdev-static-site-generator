@@ -1,3 +1,4 @@
+import sys
 import os
 import shutil
 
@@ -24,20 +25,24 @@ def copy_files(src, dest):
             print(f"Copying file {src_item} to {dest_item}")
             shutil.copy(src_item, dest_item)
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     for item in os.listdir(dir_path_content):
         item_path = os.path.join(dir_path_content, item)
         if os.path.isdir(item_path):
             dest_path = os.path.join(dest_dir_path, item)
-            generate_pages_recursive(item_path, template_path, dest_path)
+            generate_pages_recursive(item_path, template_path, dest_path, basepath)
         else:
             if item.endswith(".md"):
                 dest_path = os.path.join(dest_dir_path, item[:-3] + ".html")
-                generate_page(item_path, template_path, dest_path)
+                generate_page(item_path, template_path, dest_path, basepath)
 
 def main():
-    copy_files("./static", "./public")
-    generate_pages_recursive("./content", "./template.html", "./public")
+    basepath = sys.argv[0]
+    if basepath == None or basepath == "":
+        basepath = "/"
+    
+    copy_files("./static", "./docs")
+    generate_pages_recursive("./content", "./template.html", "./docs", basepath)
 
 
 if __name__ == "__main__":
